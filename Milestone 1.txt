@@ -1,0 +1,3 @@
+Milestone 1: Инициализация и Инфраструктура 🚀
+
+ПОнять как писать docker-compose бы поднять postgresql
