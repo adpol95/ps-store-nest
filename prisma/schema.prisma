@@ -1,0 +1,166 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ================= ENUMS =================
+enum ProductType {
+  GAME
+  CONSOLE
+  ACCESSORY
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+}
+
+enum TransactionType {
+  DEPOSIT
+  PURCHASE
+}
+
+// ================= MODELS =================
+
+model User {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  email     String   @unique
+  password  String
+  balance   Float    @default(0)
+  birthDay  DateTime @map("birth_day")
+  avatarUrl String?  @map("avatar_url")
+  country   String?
+  isOnline  Boolean  @default(false) @map("is_online")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // --- Связи (Relations) ---
+  sentFriendships     Friendship[]  @relation("Sender")
+  receivedFriendships Friendship[]  @relation("Receiver")
+  cartItems           CartItem[]
+  favorites           Favorite[]
+  orders              Order[]
+  transactions        Transaction[]
+
+  @@map("users")
+}
+
+model Product {
+  id       String      @id @default(uuid())
+  title    String      @unique
+  slug     String      @unique
+  coverUrl String      @map("cover_url")
+  price    Float
+  type     ProductType
+
+  // --- Связи (Relations) ---
+  gameDetails GameDetails?
+  cartItems   CartItem[]
+  favorites   Favorite[]
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+model GameDetails {
+  id        String   @id @default(uuid())
+  productId String   @unique @map("product_id")
+  developer String
+  rating    Float
+  ageRating String   @map("age_rating")
+  genres    String[]
+  platforms String[]
+
+  // --- Связи (Relations) ---
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("game_details")
+}
+
+model Friendship {
+  id         String           @id @default(uuid())
+  senderId   String           @map("sender_id")
+  receiverId String           @map("receiver_id")
+  status     FriendshipStatus
+  createdAt  DateTime         @default(now()) @map("created_at")
+
+  // --- Связи (Relations) ---
+  sender   User @relation("Sender", fields: [senderId], references: [id])
+  receiver User @relation("Receiver", fields: [receiverId], references: [id])
+
+  @@map("friendships")
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  productId String   @map("product_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // --- Связи (Relations) ---
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("cart_items")
+}
+
+model Favorite {
+  id        String @id @default(uuid())
+  userId    String @map("user_id")
+  productId String @map("product_id")
+
+  // --- Связи (Relations) ---
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("favorites")
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  userId    String      @map("user_id")
+  total     Float
+  status    OrderStatus
+  createdAt DateTime    @default(now()) @map("created_at")
+
+  // --- Связи (Relations) ---
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String @map("order_id")
+  productId String @map("product_id")
+  price     Float
+
+  // --- Связи (Relations) ---
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Transaction {
+  id        String          @id @default(uuid())
+  userId    String          @map("user_id")
+  amount    Float
+  type      TransactionType
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  // --- Связи (Relations) ---
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("transactions")
+}

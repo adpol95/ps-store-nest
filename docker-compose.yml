@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # Название нашего сервиса (любое имя)
+  db:
+    # 1. Скачиваем официальный образ PostgreSQL версии 16 (alpine — это облегченная Linux-версия)
+    image: postgres:16-alpine
+
+    # 2. Имя контейнера, которое будет отображаться в Docker Desktop
+    container_name: ps_store_postgres
+
+    # 3. Настройки базы данных (Логин, Пароль, Имя базы)
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: ps_store
+
+    # 4. Проброс порта: [порт на твоем ПК] : [порт внутри контейнера]
+    ports:
+      - '5432:5432'
+
+    # 5. Сохранение данных на жесткий диск (чтобы при выключении ПК данные БД не стёрлись)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+# Объявляем папки для хранения данных
+volumes:
+  postgres_data:
