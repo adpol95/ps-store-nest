@@ -7,6 +7,8 @@ import { AuthModule } from "./auth/auth.module";
 import { ConfigModule } from "@nestjs/config";
 import { APP_FILTER } from "@nestjs/core";
 import { PrismaClientExceptionFilter } from "./common/filters/prisma-client-exception.filter";
+import { ProductModule } from './product/product.module';
+import { NewsModule } from './news/news.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { PrismaClientExceptionFilter } from "./common/filters/prisma-client-exce
     PrismaModule,
     UserModule,
     AuthModule,
+    ProductModule,
+    NewsModule,
   ],
   controllers: [AppController],
   providers: [
