@@ -16,4 +16,3 @@ export class NewsController {
     return this.newsService.findOne(id);
   }
 }
-
